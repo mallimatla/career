@@ -5,8 +5,8 @@ const { sendEmail } = require('../utils/email');
 
 // Generate JWT Token
 const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE,
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET || 'your-secret-key', {
+    expiresIn: process.env.JWT_EXPIRE || '7d',
   });
 };
 
@@ -18,7 +18,7 @@ exports.register = async (req, res) => {
     const { email, password, firstName, lastName, company } = req.body;
 
     // Check if user exists
-    const existingUser = await User.findOne({ where: { email } });
+    const existingUser = await User.findByEmail(email);
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -26,7 +26,7 @@ exports.register = async (req, res) => {
       });
     }
 
-    // Create user
+    // Create user (this also creates the free subscription automatically)
     const user = await User.create({
       email,
       password,
@@ -36,37 +36,24 @@ exports.register = async (req, res) => {
       verificationToken: crypto.randomBytes(20).toString('hex'),
     });
 
-    // Create free subscription
-    await Subscription.create({
-      userId: user.id,
-      plan: 'free',
-      billingCycle: 'monthly',
-      credits: 1,
-      monthlyCredits: 1,
-      price: 0,
-      features: {
-        maxVideos: 3,
-        maxDuration: 2,
-        watermark: true,
-        customBranding: false,
-        apiAccess: false,
-        teamMembers: 1,
-      },
-    });
-
     // Send verification email
-    const verificationUrl = `${process.env.FRONTEND_URL}/verify-email/${user.verificationToken}`;
-    await sendEmail({
-      to: user.email,
-      subject: 'Welcome to ClarityVid AI - Verify Your Email',
-      html: `
-        <h1>Welcome to ClarityVid AI!</h1>
-        <p>Hi ${user.firstName},</p>
-        <p>Please verify your email by clicking the link below:</p>
-        <a href="${verificationUrl}">${verificationUrl}</a>
-        <p>If you didn't create an account, please ignore this email.</p>
-      `,
-    });
+    const verificationUrl = `${process.env.FRONTEND_URL || 'https://exodus-48741.web.app'}/verify-email/${user.verificationToken}`;
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: 'Welcome to ClarityVid AI - Verify Your Email',
+        html: `
+          <h1>Welcome to ClarityVid AI!</h1>
+          <p>Hi ${user.firstName},</p>
+          <p>Please verify your email by clicking the link below:</p>
+          <a href="${verificationUrl}">${verificationUrl}</a>
+          <p>If you didn't create an account, please ignore this email.</p>
+        `,
+      });
+    } catch (emailError) {
+      console.error('Email sending failed:', emailError);
+      // Don't fail registration if email fails
+    }
 
     const token = generateToken(user.id);
 
@@ -74,7 +61,14 @@ exports.register = async (req, res) => {
       success: true,
       message: 'User registered successfully. Please check your email to verify your account.',
       token,
-      user: user.toJSON(),
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        emailVerified: user.emailVerified,
+      },
     });
   } catch (error) {
     console.error('Register error:', error);
@@ -102,7 +96,7 @@ exports.login = async (req, res) => {
     }
 
     // Check for user
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findByEmail(email);
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -111,7 +105,7 @@ exports.login = async (req, res) => {
     }
 
     // Check password
-    const isMatch = await user.comparePassword(password);
+    const isMatch = await User.verifyPassword(password, user.password);
     if (!isMatch) {
       return res.status(401).json({
         success: false,
@@ -119,23 +113,22 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Check if user is active
-    if (user.status !== 'active') {
-      return res.status(401).json({
-        success: false,
-        message: 'Your account has been suspended. Please contact support.',
-      });
-    }
-
     // Update last login
-    await user.update({ lastLogin: new Date() });
+    await User.update(user.id, { lastLogin: new Date() });
 
     const token = generateToken(user.id);
 
     res.json({
       success: true,
       token,
-      user: user.toJSON(),
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        emailVerified: user.emailVerified,
+      },
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -152,18 +145,29 @@ exports.login = async (req, res) => {
 // @access  Private
 exports.getMe = async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.id, {
-      include: [
-        {
-          model: Subscription,
-          as: 'subscription',
-        },
-      ],
-    });
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    // Get user's subscription
+    const subscription = await Subscription.findByUserId(user.id);
 
     res.json({
       success: true,
-      user: user.toJSON(),
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        emailVerified: user.emailVerified,
+        subscription: subscription || null,
+      },
     });
   } catch (error) {
     res.status(500).json({
@@ -181,7 +185,7 @@ exports.verifyEmail = async (req, res) => {
   try {
     const { token } = req.params;
 
-    const user = await User.findOne({ where: { verificationToken: token } });
+    const user = await User.findByVerificationToken(token);
 
     if (!user) {
       return res.status(400).json({
@@ -190,8 +194,8 @@ exports.verifyEmail = async (req, res) => {
       });
     }
 
-    await user.update({
-      isVerified: true,
+    await User.update(user.id, {
+      emailVerified: true,
       verificationToken: null,
     });
 
@@ -215,7 +219,7 @@ exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
 
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findByEmail(email);
 
     if (!user) {
       return res.status(404).json({
@@ -227,24 +231,28 @@ exports.forgotPassword = async (req, res) => {
     const resetToken = crypto.randomBytes(20).toString('hex');
     const resetExpire = new Date(Date.now() + 3600000); // 1 hour
 
-    await user.update({
+    await User.update(user.id, {
       resetPasswordToken: resetToken,
       resetPasswordExpire: resetExpire,
     });
 
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL || 'https://exodus-48741.web.app'}/reset-password/${resetToken}`;
 
-    await sendEmail({
-      to: user.email,
-      subject: 'Password Reset Request',
-      html: `
-        <h1>Password Reset</h1>
-        <p>You requested a password reset. Click the link below to reset your password:</p>
-        <a href="${resetUrl}">${resetUrl}</a>
-        <p>This link will expire in 1 hour.</p>
-        <p>If you didn't request this, please ignore this email.</p>
-      `,
-    });
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: 'Password Reset Request',
+        html: `
+          <h1>Password Reset</h1>
+          <p>You requested a password reset. Click the link below to reset your password:</p>
+          <a href="${resetUrl}">${resetUrl}</a>
+          <p>This link will expire in 1 hour.</p>
+          <p>If you didn't request this, please ignore this email.</p>
+        `,
+      });
+    } catch (emailError) {
+      console.error('Email sending failed:', emailError);
+    }
 
     res.json({
       success: true,
@@ -267,21 +275,16 @@ exports.resetPassword = async (req, res) => {
     const { token } = req.params;
     const { password } = req.body;
 
-    const user = await User.findOne({
-      where: {
-        resetPasswordToken: token,
-        resetPasswordExpire: { [require('sequelize').Op.gt]: new Date() },
-      },
-    });
+    const user = await User.findByResetToken(token);
 
-    if (!user) {
+    if (!user || !user.resetPasswordExpire || new Date() > user.resetPasswordExpire) {
       return res.status(400).json({
         success: false,
         message: 'Invalid or expired reset token',
       });
     }
 
-    await user.update({
+    await User.update(user.id, {
       password,
       resetPasswordToken: null,
       resetPasswordExpire: null,
