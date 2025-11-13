@@ -1,5 +1,5 @@
 const { Video, Subscription } = require('../models');
-const { uploadToS3, deleteFromS3 } = require('../services/s3Service');
+const { uploadFile, deleteFile } = require('../services/firebaseStorage');
 const { extractTextFromFile } = require('../services/documentProcessor');
 const { generateScript } = require('../services/aiService');
 const { queueVideoGeneration } = require('../services/videoQueue');
@@ -16,9 +16,13 @@ exports.createVideo = async (req, res) => {
 
     // If file uploaded, process it
     if (req.file) {
-      // Upload to S3
-      const uploadResult = await uploadToS3(req.file, 'source-documents');
-      sourceFileUrl = uploadResult.Location;
+      // Upload to Firebase Storage
+      sourceFileUrl = await uploadFile(
+        req.file.buffer,
+        req.file.originalname,
+        'source-documents',
+        req.user.id
+      );
 
       // Extract text from file
       extractedText = await extractTextFromFile(req.file, sourceType);
@@ -338,10 +342,10 @@ exports.deleteVideo = async (req, res) => {
       });
     }
 
-    // Delete from S3
-    if (video.videoUrl) await deleteFromS3(video.videoUrl);
-    if (video.sourceFileUrl) await deleteFromS3(video.sourceFileUrl);
-    if (video.thumbnailUrl) await deleteFromS3(video.thumbnailUrl);
+    // Delete from Firebase Storage
+    if (video.videoUrl) await deleteFile(video.videoUrl);
+    if (video.sourceFileUrl) await deleteFile(video.sourceFileUrl);
+    if (video.thumbnailUrl) await deleteFile(video.thumbnailUrl);
 
     await video.destroy();
 
