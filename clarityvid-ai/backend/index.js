@@ -29,10 +29,10 @@ const limiter = rateLimit({
   max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || 100),
   message: 'Too many requests from this IP, please try again later.',
 });
-app.use('/', limiter);
+app.use('/api/', limiter);
 
 // Health check
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
@@ -41,18 +41,18 @@ app.get('/health', (req, res) => {
   });
 });
 
-// API Routes (no /api prefix - Firebase Function already mounted at /api)
-app.use('/auth', require('./src/routes/authRoutes'));
-app.use('/admin', require('./src/routes/admin'));
-app.use('/videos', require('./src/routes/videoRoutes'));
-app.use('/subscriptions', require('./src/routes/subscriptionRoutes'));
+// API Routes (Firebase Hosting forwards /api/** with the /api prefix intact)
+app.use('/api/auth', require('./src/routes/authRoutes'));
+app.use('/api/admin', require('./src/routes/admin'));
+app.use('/api/videos', require('./src/routes/videoRoutes'));
+app.use('/api/subscriptions', require('./src/routes/subscriptionRoutes'));
 
 // TODO: Add these routes when implemented
-// app.use('/presentations', require('./src/routes/presentations'));
-// app.use('/documents', require('./src/routes/documents'));
-// app.use('/websites', require('./src/routes/websites'));
-// app.use('/teams', require('./src/routes/teams'));
-// app.use('/templates', require('./src/routes/templates'));
+// app.use('/api/presentations', require('./src/routes/presentations'));
+// app.use('/api/documents', require('./src/routes/documents'));
+// app.use('/api/websites', require('./src/routes/websites'));
+// app.use('/api/teams', require('./src/routes/teams'));
+// app.use('/api/templates', require('./src/routes/templates'));
 
 // 404 handler
 app.use((req, res) => {
