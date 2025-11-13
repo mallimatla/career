@@ -1,14 +1,10 @@
 const fs = require('fs').promises;
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-const OpenAI = require('openai');
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const googleTTS = require('google-tts-api');
 
 /**
- * Generate speech from text using OpenAI TTS
+ * Generate speech from text using Google TTS
  * @param {string} text - Text to convert to speech
  * @param {object} options - Voice options
  * @returns {Buffer} - Audio buffer
@@ -16,19 +12,23 @@ const openai = new OpenAI({
 exports.generateSpeech = async (text, options = {}) => {
   try {
     const {
-      voice = 'alloy', // alloy, echo, fable, onyx, nova, shimmer
-      model = 'tts-1', // tts-1 or tts-1-hd
+      language = 'en',
       speed = 1.0,
+      voice = 'default',
     } = options;
 
-    const mp3 = await openai.audio.speech.create({
-      model,
-      voice,
-      input: text,
-      speed,
+    // Get audio URL from Google TTS
+    const url = googleTTS.getAudioUrl(text, {
+      lang: language,
+      slow: speed < 1.0,
+      host: 'https://translate.google.com',
     });
 
-    const buffer = Buffer.from(await mp3.arrayBuffer());
+    // Fetch the audio
+    const response = await fetch(url);
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
     return buffer;
   } catch (error) {
     console.error('TTS Generation Error:', error);
@@ -53,9 +53,9 @@ exports.generateSceneAudio = async (scenes, options = {}) => {
 
       audioSegments.push({
         sceneId: scene.id,
-        audioBuffer,
+        audio: audioBuffer,
+        duration: scene.duration || estimateAudioDuration(scene.narration),
         text: scene.narration,
-        duration: scene.duration || 5,
       });
     }
 
@@ -67,56 +67,76 @@ exports.generateSceneAudio = async (scenes, options = {}) => {
 };
 
 /**
- * Get available voices
- * @returns {array} - List of available voices
- */
-exports.getAvailableVoices = () => {
-  return [
-    { id: 'alloy', name: 'Alloy', gender: 'neutral', language: 'en' },
-    { id: 'echo', name: 'Echo', gender: 'male', language: 'en' },
-    { id: 'fable', name: 'Fable', gender: 'neutral', language: 'en' },
-    { id: 'onyx', name: 'Onyx', gender: 'male', language: 'en' },
-    { id: 'nova', name: 'Nova', gender: 'female', language: 'en' },
-    { id: 'shimmer', name: 'Shimmer', gender: 'female', language: 'en' },
-  ];
-};
-
-/**
- * Calculate audio duration from text
- * @param {string} text - Text content
- * @param {number} speed - Speech speed
+ * Estimate audio duration based on text length
+ * @param {string} text - Text to estimate
  * @returns {number} - Estimated duration in seconds
  */
-exports.estimateAudioDuration = (text, speed = 1.0) => {
-  // Average speaking rate: ~150 words per minute
+exports.estimateAudioDuration = (text) => {
+  // Average speaking rate: 150 words per minute
   const words = text.split(/\s+/).length;
-  const baseMinutes = words / 150;
-  const seconds = (baseMinutes * 60) / speed;
-  return Math.ceil(seconds);
+  const minutes = words / 150;
+  const seconds = Math.ceil(minutes * 60);
+
+  // Add buffer for pauses
+  return seconds + Math.ceil(seconds * 0.1);
 };
 
 /**
- * Split long text into chunks for TTS
- * @param {string} text - Long text
- * @param {number} maxLength - Maximum characters per chunk
- * @returns {array} - Array of text chunks
+ * Save audio to file
+ * @param {Buffer} audioBuffer - Audio buffer
+ * @param {string} outputPath - Output file path
+ * @returns {string} - File path
  */
-exports.splitTextForTTS = (text, maxLength = 4000) => {
-  const chunks = [];
-  const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
-
-  let currentChunk = '';
-
-  for (const sentence of sentences) {
-    if ((currentChunk + sentence).length > maxLength) {
-      if (currentChunk) chunks.push(currentChunk.trim());
-      currentChunk = sentence;
-    } else {
-      currentChunk += ' ' + sentence;
-    }
+exports.saveAudioFile = async (audioBuffer, outputPath) => {
+  try {
+    await fs.writeFile(outputPath, audioBuffer);
+    return outputPath;
+  } catch (error) {
+    console.error('Save Audio File Error:', error);
+    throw new Error('Failed to save audio file: ' + error.message);
   }
-
-  if (currentChunk) chunks.push(currentChunk.trim());
-
-  return chunks;
 };
+
+/**
+ * Generate audio file from text
+ * @param {string} text - Text to convert
+ * @param {string} outputDir - Output directory
+ * @param {object} options - Voice options
+ * @returns {string} - File path
+ */
+exports.generateAudioFile = async (text, outputDir, options = {}) => {
+  try {
+    const audioBuffer = await exports.generateSpeech(text, options);
+    const fileName = `audio-${uuidv4()}.mp3`;
+    const filePath = path.join(outputDir, fileName);
+
+    await exports.saveAudioFile(audioBuffer, filePath);
+
+    return filePath;
+  } catch (error) {
+    console.error('Generate Audio File Error:', error);
+    throw new Error('Failed to generate audio file: ' + error.message);
+  }
+};
+
+/**
+ * Merge multiple audio segments
+ * @param {array} audioSegments - Array of audio buffers
+ * @returns {Buffer} - Merged audio buffer
+ */
+exports.mergeAudioSegments = async (audioSegments) => {
+  try {
+    // Simple concatenation - for production, use ffmpeg for proper merging
+    const buffers = audioSegments.map(segment => segment.audio);
+    const merged = Buffer.concat(buffers);
+    return merged;
+  } catch (error) {
+    console.error('Merge Audio Error:', error);
+    throw new Error('Failed to merge audio segments: ' + error.message);
+  }
+};
+
+// Helper function reference for compatibility
+const estimateAudioDuration = exports.estimateAudioDuration;
+
+module.exports = exports;
