@@ -1,0 +1,103 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isTeamMember(teamId) {
+      return isAuthenticated() &&
+             exists(/databases/$(database)/documents/teamMembers/$(teamId + '_' + request.auth.uid));
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isOwner(userId);
+    }
+
+    // Subscriptions collection
+    match /subscriptions/{subscriptionId} {
+      allow read: if isAuthenticated() &&
+                     resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() &&
+                       resource.data.userId == request.auth.uid;
+      allow delete: if false; // Don't allow deletion
+    }
+
+    // Videos collection
+    match /videos/{videoId} {
+      allow read: if isAuthenticated() &&
+                     (resource.data.userId == request.auth.uid ||
+                      isTeamMember(resource.data.teamId));
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() &&
+                               resource.data.userId == request.auth.uid;
+    }
+
+    // Presentations collection
+    match /presentations/{presentationId} {
+      allow read: if isAuthenticated() &&
+                     (resource.data.userId == request.auth.uid ||
+                      isTeamMember(resource.data.teamId));
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() &&
+                               resource.data.userId == request.auth.uid;
+    }
+
+    // Documents collection
+    match /documents/{documentId} {
+      allow read: if isAuthenticated() &&
+                     (resource.data.userId == request.auth.uid ||
+                      isTeamMember(resource.data.teamId));
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() &&
+                               resource.data.userId == request.auth.uid;
+    }
+
+    // Websites collection
+    match /websites/{websiteId} {
+      allow read: if isAuthenticated() &&
+                     (resource.data.userId == request.auth.uid ||
+                      isTeamMember(resource.data.teamId));
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() &&
+                               resource.data.userId == request.auth.uid;
+    }
+
+    // Teams collection
+    match /teams/{teamId} {
+      allow read: if isAuthenticated() && isTeamMember(teamId);
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() &&
+                               resource.data.ownerId == request.auth.uid;
+    }
+
+    // Team Members collection
+    match /teamMembers/{memberId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() &&
+                               (resource.data.userId == request.auth.uid ||
+                                isTeamMember(resource.data.teamId));
+    }
+
+    // Orders collection (for Razorpay)
+    match /orders/{orderId} {
+      allow read: if isAuthenticated() &&
+                     resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() &&
+                       resource.data.userId == request.auth.uid;
+      allow delete: if false;
+    }
+  }
+}

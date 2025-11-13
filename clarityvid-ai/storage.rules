@@ -1,0 +1,53 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Helper function
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // User uploads (profile pictures, etc.)
+    match /users/{userId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Video files
+    match /videos/{userId}/{videoId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Presentation files
+    match /presentations/{userId}/{presentationId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Document files
+    match /documents/{userId}/{documentId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Website files
+    match /websites/{userId}/{websiteId}/{allPaths=**} {
+      allow read: if true; // Websites should be publicly accessible
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Team shared files
+    match /teams/{teamId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // Temporary uploads
+    match /temp/{userId}/{allPaths=**} {
+      allow read, write: if isAuthenticated() &&
+                            request.auth.uid == userId &&
+                            request.resource.size < 100 * 1024 * 1024; // 100MB limit
+    }
+  }
+}
