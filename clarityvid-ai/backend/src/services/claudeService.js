@@ -333,12 +333,5 @@ Create a website with appropriate pages and sections. Format as JSON:
   }
 };
 
-module.exports = {
-  generateScript,
-  analyzeDocument,
-  generateSceneVisuals,
-  translateScript,
-  generateSlideContent,
-  structureDocument,
-  generateWebsiteStructure,
-};
+// Export all functions
+module.exports = exports;
