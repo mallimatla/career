@@ -30,7 +30,7 @@ jobs:
           sudo apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
 
       - name: 📦 Install Backend Dependencies
-        working-directory: ./clarityvid-ai/backend
+        working-directory: backend
         run: |
           if [ ! -f package-lock.json ]; then
             npm install
@@ -39,7 +39,7 @@ jobs:
           fi
 
       - name: 📦 Install Frontend Dependencies
-        working-directory: ./clarityvid-ai/frontend
+        working-directory: frontend
         run: |
           if [ ! -f package-lock.json ]; then
             npm install
@@ -48,13 +48,12 @@ jobs:
           fi
 
       - name: 🏗️ Build Frontend for Production
-        working-directory: ./clarityvid-ai/frontend
+        working-directory: frontend
         run: npm run build
         env:
           CI: false
 
       - name: 🔑 Setup Firebase Service Account
-        working-directory: ./clarityvid-ai
         run: |
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > firebase-adminsdk.json
           export GOOGLE_APPLICATION_CREDENTIALS="firebase-adminsdk.json"
@@ -63,7 +62,6 @@ jobs:
         run: npm install -g firebase-tools
 
       - name: 🚀 Deploy to Firebase
-        working-directory: ./clarityvid-ai
         env:
           GOOGLE_APPLICATION_CREDENTIALS: firebase-adminsdk.json
         run: |
