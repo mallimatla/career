@@ -1,6 +1,6 @@
 {
   "name": "clarityvid-ai-frontend",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "ClarityVid AI Frontend - Professional Video Generation Platform",
   "private": true,
   "dependencies": {
