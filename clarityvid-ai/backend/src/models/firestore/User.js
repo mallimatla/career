@@ -35,18 +35,30 @@ class User {
       const userRef = db.collection('users').doc();
 
       // Hash password
-      if (userData.password) {
-        userData.password = await this.hashPassword(userData.password);
-      }
+      const hashedPassword = userData.password ? await this.hashPassword(userData.password) : null;
 
-      const user = new User({
+      const userDoc = {
         id: userRef.id,
-        ...userData,
+        email: userData.email,
+        password: hashedPassword,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        company: userData.company || null,
+        emailVerified: false,
+        verificationToken: userData.verificationToken || null,
+        resetPasswordToken: null,
+        resetPasswordExpire: null,
+        role: 'user',
+        plan: 'free',
+        avatar: null,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
-      });
+      };
 
-      await userRef.set(JSON.parse(JSON.stringify(user)));
+      await userRef.set(userDoc);
+
+      // Create user object to return (without exposing password in return value)
+      const user = new User(userDoc);
 
       // Create default subscription
       const subscriptionRef = db.collection('subscriptions').doc();
