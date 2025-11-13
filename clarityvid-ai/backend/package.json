@@ -1,23 +1,39 @@
 {
   "name": "clarityvid-ai-backend",
-  "version": "1.0.0",
-  "description": "ClarityVid AI - Enterprise AI-Powered Video Generation Platform Backend",
+  "version": "2.0.0",
+  "description": "ClarityVid AI - Complete Content Generation Platform Backend",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "jest --coverage",
+    "test": "NODE_ENV=test jest --coverage --detectOpenHandles",
+    "test:watch": "NODE_ENV=test jest --watch",
+    "test:unit": "NODE_ENV=test jest tests/unit --coverage",
+    "test:integration": "NODE_ENV=test jest tests/integration --coverage",
     "migrate": "node src/utils/migrate.js",
     "seed": "node src/utils/seed.js",
     "worker": "node src/workers/videoProcessor.js"
   },
+  "jest": {
+    "testEnvironment": "node",
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/server.js",
+      "!src/workers/**"
+    ],
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
+    "setupFilesAfterEnv": ["./tests/setup.js"]
+  },
   "keywords": [
     "ai",
     "video",
-    "generation",
-    "whiteboard",
-    "animation",
-    "explainer"
+    "presentation",
+    "document",
+    "website",
+    "generation"
   ],
   "author": "ClarityVid AI Team",
   "license": "MIT",
@@ -57,7 +73,10 @@
     "nodemailer": "^6.9.7",
     "socket.io": "^4.6.0",
     "cron": "^3.1.6",
-    "puppeteer": "^21.6.1"
+    "puppeteer": "^21.6.1",
+    "pptxgenjs": "^3.12.0",
+    "docx": "^8.5.0",
+    "jszip": "^3.10.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.2",
