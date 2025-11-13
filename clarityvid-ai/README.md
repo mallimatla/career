@@ -516,5 +516,7 @@ Built with ❤️ by the ClarityVid AI Team
 - Y Combinator for inspiration (Golpo AI)
 
 ---
+## Deployment Status
+Deployed to Firebase: https://exodus-48741.web.app
 
 **ClarityVid AI** - Making video creation as easy as writing.
