@@ -24,13 +24,28 @@ jobs:
         with:
           node-version: '18'
 
+      - name: 📦 Install System Dependencies for Canvas
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+
       - name: 📦 Install Backend Dependencies
         working-directory: ./clarityvid-ai/backend
-        run: npm ci
+        run: |
+          if [ ! -f package-lock.json ]; then
+            npm install
+          else
+            npm ci
+          fi
 
       - name: 📦 Install Frontend Dependencies
         working-directory: ./clarityvid-ai/frontend
-        run: npm ci
+        run: |
+          if [ ! -f package-lock.json ]; then
+            npm install
+          else
+            npm ci
+          fi
 
       - name: 🏗️ Build Frontend for Production
         working-directory: ./clarityvid-ai/frontend
