@@ -31,21 +31,11 @@ jobs:
 
       - name: 📦 Install Backend Dependencies
         working-directory: clarityvid-ai/backend
-        run: |
-          if [ ! -f package-lock.json ]; then
-            npm install
-          else
-            npm ci
-          fi
+        run: npm install
 
       - name: 📦 Install Frontend Dependencies
         working-directory: clarityvid-ai/frontend
-        run: |
-          if [ ! -f package-lock.json ]; then
-            npm install
-          else
-            npm ci
-          fi
+        run: npm ci
 
       - name: 🏗️ Build Frontend for Production
         working-directory: clarityvid-ai/frontend
