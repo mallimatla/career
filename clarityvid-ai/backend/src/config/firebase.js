@@ -12,22 +12,31 @@ const initializeFirebase = () => {
   }
 
   try {
-    // Initialize with environment variables
-    const serviceAccount = {
-      type: 'service_account',
-      project_id: process.env.FIREBASE_PROJECT_ID,
-      private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      client_email: process.env.FIREBASE_CLIENT_EMAIL,
-    };
+    // Check if running in Firebase Functions (GCP environment)
+    const isFirebaseFunctions = process.env.FUNCTION_NAME || process.env.FIREBASE_CONFIG;
 
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-      storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-      databaseURL: process.env.FIREBASE_DATABASE_URL,
-    });
+    if (isFirebaseFunctions) {
+      // Running in Firebase Functions - use default credentials
+      admin.initializeApp();
+      console.log('✅ Firebase initialized with default credentials (Firebase Functions)');
+    } else {
+      // Running locally or in other environments - use service account
+      const serviceAccount = {
+        type: 'service_account',
+        project_id: process.env.FIREBASE_PROJECT_ID,
+        private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        client_email: process.env.FIREBASE_CLIENT_EMAIL,
+      };
+
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+        databaseURL: process.env.FIREBASE_DATABASE_URL,
+      });
+      console.log('✅ Firebase initialized with service account credentials');
+    }
 
     firebaseInitialized = true;
-    console.log('✅ Firebase initialized successfully');
     return admin.app();
   } catch (error) {
     console.error('❌ Firebase initialization error:', error);
