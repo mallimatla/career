@@ -1,11 +1,11 @@
 const { createCanvas } = require('canvas');
 const ffmpeg = require('fluent-ffmpeg');
-const ffmpegPath = require('ffmpeg-static');
+const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const path = require('path');
 const fs = require('fs').promises;
 const { v4: uuidv4 } = require('uuid');
 const { generateSceneAudio, estimateAudioDuration } = require('./ttsService');
-const { uploadBufferToS3 } = require('./s3Service');
+const { uploadFile } = require('./firebaseStorage');
 
 ffmpeg.setFfmpegPath(ffmpegPath);
 

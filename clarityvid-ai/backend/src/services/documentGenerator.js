@@ -1,6 +1,6 @@
 const { Document: DocxDocument, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, AlignmentType } = require('docx');
 const { getTemplate } = require('./templateService');
-const { uploadBufferToS3 } = require('./s3Service');
+const { uploadFile } = require('./firebaseStorage');
 const marked = require('marked');
 
 /**

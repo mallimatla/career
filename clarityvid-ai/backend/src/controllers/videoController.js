@@ -1,7 +1,7 @@
 const { Video, Subscription } = require('../models');
 const { uploadFile, deleteFile } = require('../services/firebaseStorage');
 const { extractTextFromFile } = require('../services/documentProcessor');
-const { generateScript } = require('../services/aiService');
+const { generateScript } = require('../services/claudeService');
 const { queueVideoGeneration } = require('../services/videoQueue');
 
 // @desc    Create new video

@@ -1,5 +1,5 @@
 const { getTemplate } = require('./templateService');
-const { uploadBufferToS3 } = require('./s3Service');
+const { uploadFile } = require('./firebaseStorage');
 const JSZip = require('jszip');
 
 /**

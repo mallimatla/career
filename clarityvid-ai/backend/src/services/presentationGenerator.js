@@ -1,7 +1,7 @@
 const PptxGenJs = require('pptxgenjs');
 const { getTemplate } = require('./templateService');
-const { generateScript } = require('./aiService');
-const { uploadBufferToS3 } = require('./s3Service');
+const { generateScript } = require('./claudeService');
+const { uploadFile } = require('./firebaseStorage');
 
 /**
  * Generate presentation from content
