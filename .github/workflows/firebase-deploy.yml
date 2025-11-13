@@ -63,11 +63,17 @@ jobs:
       - name: 🔥 Install Firebase Tools
         run: npm install -g firebase-tools
 
-      - name: 🚀 Deploy to Firebase
+      - name: 🚀 Deploy Hosting First
         env:
           GOOGLE_APPLICATION_CREDENTIALS: firebase-adminsdk.json
         run: |
-          firebase deploy --project exodus-48741 --non-interactive --force
+          firebase deploy --only hosting --project exodus-48741 --non-interactive
+
+      - name: 🚀 Deploy Everything
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: firebase-adminsdk.json
+        run: |
+          firebase deploy --project exodus-48741 --non-interactive
 
       - name: 🧹 Cleanup
         if: always()
