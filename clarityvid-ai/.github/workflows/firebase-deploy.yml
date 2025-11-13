@@ -44,17 +44,29 @@ jobs:
         env:
           CI: false
 
+      - name: 🔑 Setup Firebase Service Account
+        working-directory: ./clarityvid-ai
+        run: |
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > firebase-adminsdk.json
+          export GOOGLE_APPLICATION_CREDENTIALS="firebase-adminsdk.json"
+
       - name: 🔥 Install Firebase Tools
         run: npm install -g firebase-tools
 
-      - name: 🚀 Deploy Everything to Firebase
+      - name: 🚀 Deploy to Firebase
         working-directory: ./clarityvid-ai
-        run: firebase deploy --token "${{ secrets.FIREBASE_TOKEN }}"
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: firebase-adminsdk.json
+        run: |
+          firebase deploy --project exodus-48741 --non-interactive
+
+      - name: 🧹 Cleanup
+        if: always()
+        run: rm -f firebase-adminsdk.json
 
       - name: ✅ Deployment Summary
         run: |
           echo "🎉 Deployment Complete!"
-          echo "📱 Frontend: Deployed to Firebase Hosting"
-          echo "⚡ Backend: Firebase Functions deployed"
-          echo "🔒 Security: Firestore & Storage rules updated"
-          echo "🌐 Access your app at the Firebase Hosting URL"
+          echo "📱 Frontend: https://exodus-48741.web.app"
+          echo "⚡ Backend: https://exodus-48741.web.app/api"
+          echo "🔐 Admin: https://exodus-48741.web.app/admin/login"
