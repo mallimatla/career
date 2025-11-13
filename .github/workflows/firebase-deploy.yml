@@ -53,6 +53,17 @@ jobs:
         env:
           CI: false
 
+      - name: 🔍 Verify Build Output
+        run: |
+          echo "=== Checking build directory ==="
+          ls -la frontend/build/ || echo "Build directory not found!"
+          echo "=== Checking if index.html exists ==="
+          ls -la frontend/build/index.html || echo "index.html not found!"
+          echo "=== Current directory ==="
+          pwd
+          echo "=== Directory structure ==="
+          ls -la
+
       - name: 🔑 Setup Firebase Service Account
         run: |
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > firebase-adminsdk.json
