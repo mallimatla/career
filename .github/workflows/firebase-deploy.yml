@@ -67,7 +67,7 @@ jobs:
         env:
           GOOGLE_APPLICATION_CREDENTIALS: firebase-adminsdk.json
         run: |
-          firebase deploy --project exodus-48741 --non-interactive
+          firebase deploy --project exodus-48741 --non-interactive --force
 
       - name: 🧹 Cleanup
         if: always()

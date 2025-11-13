@@ -5,7 +5,6 @@
     "runtime": "nodejs20"
   },
   "hosting": {
-    "site": "exodus-48741",
     "public": "frontend/build",
     "ignore": [
       "firebase.json",
