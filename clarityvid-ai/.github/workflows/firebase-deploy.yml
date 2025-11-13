@@ -1,0 +1,60 @@
+name: Deploy to Firebase
+
+on:
+  push:
+    branches:
+      - main
+      - claude/golpoai-website-clone-011CV59ETNzdTYb4hUnvgMMD
+    paths:
+      - 'clarityvid-ai/backend/**'
+      - 'clarityvid-ai/frontend/**'
+      - 'clarityvid-ai/firestore.rules'
+      - 'clarityvid-ai/storage.rules'
+      - 'clarityvid-ai/firebase.json'
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
+
+jobs:
+  deploy:
+    name: Build and Deploy to Firebase
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./clarityvid-ai
+
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: 📦 Install Backend Dependencies
+        working-directory: ./clarityvid-ai/backend
+        run: npm ci
+
+      - name: 📦 Install Frontend Dependencies
+        working-directory: ./clarityvid-ai/frontend
+        run: npm ci
+
+      - name: 🏗️ Build Frontend for Production
+        working-directory: ./clarityvid-ai/frontend
+        run: npm run build
+        env:
+          CI: false
+
+      - name: 🔥 Install Firebase Tools
+        run: npm install -g firebase-tools
+
+      - name: 🚀 Deploy Everything to Firebase
+        working-directory: ./clarityvid-ai
+        run: firebase deploy --token "${{ secrets.FIREBASE_TOKEN }}"
+
+      - name: ✅ Deployment Summary
+        run: |
+          echo "🎉 Deployment Complete!"
+          echo "📱 Frontend: Deployed to Firebase Hosting"
+          echo "⚡ Backend: Firebase Functions deployed"
+          echo "🔒 Security: Firestore & Storage rules updated"
+          echo "🌐 Access your app at the Firebase Hosting URL"
