@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golpo Video - AI-Powered Whiteboard Animation Videos</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <a href="/">
+                        <svg width="150" height="40" viewBox="0 0 150 40" fill="none">
+                            <text x="10" y="28" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#333">Golpo Video</text>
+                        </svg>
+                    </a>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="../main-site/index.html">Home</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="#blog">Blog</a></li>
+                </ul>
+                <div class="nav-buttons">
+                    <a href="#signin" class="btn-signin">Sign In</a>
+                    <a href="#getstarted" class="btn-primary">Get Started</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Convert Documents into Whiteboard Animation Videos</h1>
+                <p class="hero-subtitle">AI-powered video creation from your PDFs, documents, and text prompts in 50+ languages</p>
+                <div class="hero-buttons">
+                    <a href="#getstarted" class="btn-primary">Get Started Free</a>
+                    <a href="#demo" class="btn-secondary">Book a Demo</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Example Output Section -->
+    <section class="examples">
+        <div class="container">
+            <h2 class="section-title">Example Output</h2>
+            <p class="section-subtitle">See what our AI can create from your content</p>
+            <div class="examples-grid">
+                <div class="example-card">
+                    <div class="video-placeholder">
+                        <svg width="100%" height="200" viewBox="0 0 400 200">
+                            <rect width="400" height="200" fill="#f0f0f0" rx="8"/>
+                            <circle cx="200" cy="100" r="40" fill="#fff"/>
+                            <polygon points="185,80 185,120 220,100" fill="#2563eb"/>
+                        </svg>
+                    </div>
+                    <h3>Educational Content</h3>
+                    <p>Complex topics explained simply</p>
+                </div>
+                <div class="example-card">
+                    <div class="video-placeholder">
+                        <svg width="100%" height="200" viewBox="0 0 400 200">
+                            <rect width="400" height="200" fill="#f0f0f0" rx="8"/>
+                            <circle cx="200" cy="100" r="40" fill="#fff"/>
+                            <polygon points="185,80 185,120 220,100" fill="#2563eb"/>
+                        </svg>
+                    </div>
+                    <h3>Business Presentations</h3>
+                    <p>Professional whiteboard animations</p>
+                </div>
+                <div class="example-card">
+                    <div class="video-placeholder">
+                        <svg width="100%" height="200" viewBox="0 0 400 200">
+                            <rect width="400" height="200" fill="#f0f0f0" rx="8"/>
+                            <circle cx="200" cy="100" r="40" fill="#fff"/>
+                            <polygon points="185,80 185,120 220,100" fill="#2563eb"/>
+                        </svg>
+                    </div>
+                    <h3>Marketing Videos</h3>
+                    <p>Engaging promotional content</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <h2 class="section-title">Choose Your Plan</h2>
+            <div class="pricing-toggle">
+                <span class="toggle-label">Monthly</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="billingToggle">
+                    <span class="slider"></span>
+                </label>
+                <span class="toggle-label">Annual <span class="save-badge">Save 20%</span></span>
+            </div>
+            <div class="pricing-grid">
+                <!-- Free Plan -->
+                <div class="pricing-card">
+                    <h3 class="plan-name">Free</h3>
+                    <div class="plan-price">
+                        <span class="price">$0</span>
+                        <span class="period">/month</span>
+                    </div>
+                    <ul class="plan-features">
+                        <li>✓ 3 videos per month</li>
+                        <li>✓ Up to 2 minutes per video</li>
+                        <li>✓ Basic templates</li>
+                        <li>✓ Watermark included</li>
+                        <li>✗ No custom branding</li>
+                    </ul>
+                    <a href="#subscribe" class="btn-subscribe">Get Started</a>
+                </div>
+
+                <!-- Starter Plan -->
+                <div class="pricing-card">
+                    <h3 class="plan-name">Starter</h3>
+                    <div class="plan-price">
+                        <span class="price monthly-price">$29</span>
+                        <span class="price annual-price" style="display: none;">$23</span>
+                        <span class="period">/month</span>
+                    </div>
+                    <ul class="plan-features">
+                        <li>✓ 10 videos per month</li>
+                        <li>✓ Up to 5 minutes per video</li>
+                        <li>✓ All templates</li>
+                        <li>✓ No watermark</li>
+                        <li>✓ Custom voiceover</li>
+                    </ul>
+                    <a href="#subscribe" class="btn-subscribe">Subscribe</a>
+                </div>
+
+                <!-- Professional Plan -->
+                <div class="pricing-card featured">
+                    <div class="popular-badge">Most Popular</div>
+                    <h3 class="plan-name">Professional</h3>
+                    <div class="plan-price">
+                        <span class="price monthly-price">$79</span>
+                        <span class="price annual-price" style="display: none;">$63</span>
+                        <span class="period">/month</span>
+                    </div>
+                    <ul class="plan-features">
+                        <li>✓ 30 videos per month</li>
+                        <li>✓ Up to 15 minutes per video</li>
+                        <li>✓ All templates</li>
+                        <li>✓ Custom logo & colors</li>
+                        <li>✓ Frame-by-frame editing</li>
+                        <li>✓ Priority support</li>
+                    </ul>
+                    <a href="#subscribe" class="btn-subscribe">Subscribe</a>
+                </div>
+
+                <!-- Business Plan -->
+                <div class="pricing-card">
+                    <h3 class="plan-name">Business</h3>
+                    <div class="plan-price">
+                        <span class="price monthly-price">$149</span>
+                        <span class="price annual-price" style="display: none;">$119</span>
+                        <span class="period">/month</span>
+                    </div>
+                    <ul class="plan-features">
+                        <li>✓ 100 videos per month</li>
+                        <li>✓ Unlimited duration</li>
+                        <li>✓ All templates</li>
+                        <li>✓ Full customization</li>
+                        <li>✓ API access</li>
+                        <li>✓ Dedicated support</li>
+                    </ul>
+                    <a href="#subscribe" class="btn-subscribe">Subscribe</a>
+                </div>
+
+                <!-- Agency Plan -->
+                <div class="pricing-card">
+                    <h3 class="plan-name">Agency</h3>
+                    <div class="plan-price">
+                        <span class="price monthly-price">$299</span>
+                        <span class="price annual-price" style="display: none;">$239</span>
+                        <span class="period">/month</span>
+                    </div>
+                    <ul class="plan-features">
+                        <li>✓ 500 videos per month</li>
+                        <li>✓ Unlimited duration</li>
+                        <li>✓ White-label option</li>
+                        <li>✓ Team collaboration</li>
+                        <li>✓ API access</li>
+                        <li>✓ Priority support</li>
+                    </ul>
+                    <a href="#subscribe" class="btn-subscribe">Subscribe</a>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="pricing-card">
+                    <h3 class="plan-name">Enterprise</h3>
+                    <div class="plan-price">
+                        <span class="price">Custom</span>
+                    </div>
+                    <ul class="plan-features">
+                        <li>✓ Unlimited videos</li>
+                        <li>✓ Custom integration</li>
+                        <li>✓ Dedicated infrastructure</li>
+                        <li>✓ SLA guarantee</li>
+                        <li>✓ Custom training</li>
+                        <li>✓ 24/7 support</li>
+                    </ul>
+                    <a href="#contact" class="btn-subscribe">Contact Sales</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq" id="faq">
+        <div class="container">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <div class="faq-categories">
+                <button class="faq-category active" data-category="general">General</button>
+                <button class="faq-category" data-category="pricing">Pricing</button>
+                <button class="faq-category" data-category="features">Features</button>
+                <button class="faq-category" data-category="technical">Technical</button>
+            </div>
+            <div class="faq-content">
+                <div class="faq-section active" data-category="general">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>What is Golpo Video?</h3>
+                            <span class="faq-icon">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Golpo Video is an AI-powered platform that transforms documents, PDFs, and text prompts into engaging whiteboard animation videos. Our advanced AI automatically generates scripts, animations, and voiceovers in 50+ languages.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>How does it work?</h3>
+                            <span class="faq-icon">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Simply upload your document or paste your text, and our AI will analyze the content, create a script, generate animations, and add a voiceover. You can then customize colors, edit the script, and fine-tune every aspect of your video.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>What file formats are supported?</h3>
+                            <span class="faq-icon">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>We support PDF, DOCX, TXT, and direct text input. You can also provide URLs to web content that you'd like to convert into videos.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-section" data-category="pricing">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Can I cancel my subscription anytime?</h3>
+                            <span class="faq-icon">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Yes, you can cancel your subscription at any time. Your access will continue until the end of your current billing period.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Do you offer refunds?</h3>
+                            <span class="faq-icon">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>We offer a 14-day money-back guarantee for all paid plans. If you're not satisfied, contact our support team for a full refund.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>What happens if I exceed my video limit?</h3>
+                            <span class="faq-icon">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>You can upgrade to a higher plan or purchase additional videos as needed. We'll notify you when you're approaching your limit.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-section" data-category="features">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Can I customize the voiceover?</h3>
+                            <span class="faq-icon">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Yes! You can choose from multiple voice options, adjust speed, pitch, and even upload your own voiceover on Professional plans and above.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Can I add my company logo?</h3>
+                            <span class="faq-icon">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Yes, Professional and higher plans allow you to add custom logos and brand colors to your videos.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>How many languages are supported?</h3>
+                            <span class="faq-icon">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>We support 50+ languages with natural-sounding voiceovers, including English, Spanish, French, German, Chinese, Japanese, and many more.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-section" data-category="technical">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Is there an API available?</h3>
+                            <span class="faq-icon">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Yes, API access is available on Business and Agency plans. Contact our sales team for documentation and integration support.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>What video formats can I export?</h3>
+                            <span class="faq-icon">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Videos can be exported in MP4, MOV, and WebM formats at various resolutions including 720p, 1080p, and 4K.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>How long does it take to generate a video?</h3>
+                            <span class="faq-icon">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Most videos are generated within 2-5 minutes, depending on length and complexity. You'll receive a notification when your video is ready.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Golpo Video</h4>
+                    <p>AI-powered whiteboard animation videos</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="#pricing">Pricing</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#examples">Examples</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#faq">FAQ</a></li>
+                        <li><a href="#blog">Blog</a></li>
+                        <li><a href="#docs">Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook" class="social-icon">📘</a>
+                        <a href="#" aria-label="Instagram" class="social-icon">📷</a>
+                        <a href="#" aria-label="LinkedIn" class="social-icon">💼</a>
+                        <a href="#" aria-label="Twitter" class="social-icon">🐦</a>
+                        <a href="#" aria-label="YouTube" class="social-icon">📺</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Red Tree Inc. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
