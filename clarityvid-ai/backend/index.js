@@ -42,15 +42,17 @@ app.get('/health', (req, res) => {
 });
 
 // API Routes
-app.use('/api/auth', require('./src/routes/auth'));
+app.use('/api/auth', require('./src/routes/authRoutes'));
 app.use('/api/admin', require('./src/routes/admin'));
-app.use('/api/videos', require('./src/routes/videos'));
-app.use('/api/presentations', require('./src/routes/presentations'));
-app.use('/api/documents', require('./src/routes/documents'));
-app.use('/api/websites', require('./src/routes/websites'));
-app.use('/api/subscriptions', require('./src/routes/subscriptions'));
-app.use('/api/teams', require('./src/routes/teams'));
-app.use('/api/templates', require('./src/routes/templates'));
+app.use('/api/videos', require('./src/routes/videoRoutes'));
+app.use('/api/subscriptions', require('./src/routes/subscriptionRoutes'));
+
+// TODO: Add these routes when implemented
+// app.use('/api/presentations', require('./src/routes/presentations'));
+// app.use('/api/documents', require('./src/routes/documents'));
+// app.use('/api/websites', require('./src/routes/websites'));
+// app.use('/api/teams', require('./src/routes/teams'));
+// app.use('/api/templates', require('./src/routes/templates'));
 
 // 404 handler
 app.use((req, res) => {
