@@ -78,7 +78,7 @@ jobs:
           JWT_SECRET=clarityvid-secure-jwt-secret-key-2024-production
           JWT_EXPIRE=7d
 
-          # Anthropic Claude Configuration
+          # Anthropic Claude Configuration (for local development only)
           ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}
 
           # Rate Limiting
@@ -92,6 +92,14 @@ jobs:
           # Logging
           LOG_LEVEL=info
           EOF
+
+      - name: 🔐 Configure Firebase Secrets
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: firebase-adminsdk.json
+        run: |
+          # Set the ANTHROPIC_API_KEY secret for Firebase Functions
+          echo "Setting up Firebase Secrets..."
+          echo "${{ secrets.ANTHROPIC_API_KEY }}" | firebase functions:secrets:set ANTHROPIC_API_KEY --project exodus-48741 --force --data-file=-
 
       - name: 🚀 Deploy to Firebase
         env:

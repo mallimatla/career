@@ -1,9 +1,14 @@
 const Anthropic = require('@anthropic-ai/sdk');
 
-// Check if API key is configured
+// Get API key from environment variable
+// When deployed to Firebase Functions, this will be automatically populated from the secret
+// For local development, it will come from the .env file
 const apiKey = process.env.ANTHROPIC_API_KEY;
+
 if (!apiKey) {
-  console.warn('WARNING: ANTHROPIC_API_KEY environment variable is not set. Script generation will fail.');
+  console.warn('WARNING: ANTHROPIC_API_KEY environment variable is not set.');
+  console.warn('For Firebase Functions: Ensure the secret is configured using Firebase Secrets Manager.');
+  console.warn('For local development: Set ANTHROPIC_API_KEY in your .env file.');
 }
 
 const anthropic = new Anthropic({

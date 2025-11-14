@@ -2,12 +2,16 @@
 require('dotenv').config();
 
 const functions = require('firebase-functions');
+const { defineSecret } = require('firebase-functions/params');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
+
+// Define secrets for Firebase Functions
+const anthropicApiKey = defineSecret('ANTHROPIC_API_KEY');
 
 // Initialize Firebase
 require('./src/config/firebase');
@@ -89,8 +93,14 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Export Express app as Firebase Function
-exports.api = functions.https.onRequest(app);
+// Export Express app as Firebase Function with secrets
+exports.api = functions
+  .runWith({
+    secrets: ['ANTHROPIC_API_KEY'],
+    timeoutSeconds: 540, // 9 minutes for long-running AI requests
+    memory: '512MB',
+  })
+  .https.onRequest(app);
 
 // Background Functions
 
