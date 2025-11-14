@@ -15,6 +15,9 @@ require('./src/config/firebase');
 // Create Express app
 const app = express();
 
+// Trust proxy - required for Firebase Cloud Functions
+app.set('trust proxy', true);
+
 // Middleware
 app.use(helmet());
 app.use(cors({
