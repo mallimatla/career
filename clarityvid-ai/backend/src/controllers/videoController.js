@@ -75,7 +75,7 @@ exports.generateVideoScript = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const video = await Video.findByPk(id);
+    const video = await Video.findById(id);
 
     if (!video) {
       return res.status(404).json({
@@ -103,12 +103,12 @@ exports.generateVideoScript = async (req, res) => {
     const script = await generateScript(video.sourceText, video.language);
 
     // Deduct 10% credit for script generation
-    await req.subscription.update({
+    await Subscription.update(req.subscription.id, {
       creditsUsed: req.subscription.creditsUsed + 0.1,
     });
 
     // Update video with script
-    await video.update({
+    await Video.update(video.id, {
       script: script.text,
       storyboard: script.scenes,
       duration: script.estimatedDuration,
@@ -140,7 +140,7 @@ exports.updateScript = async (req, res) => {
     const { id } = req.params;
     const { script, storyboard } = req.body;
 
-    const video = await Video.findByPk(id);
+    const video = await Video.findById(id);
 
     if (!video) {
       return res.status(404).json({
@@ -156,7 +156,7 @@ exports.updateScript = async (req, res) => {
       });
     }
 
-    await video.update({
+    const updatedVideo = await Video.update(video.id, {
       script,
       storyboard: storyboard || video.storyboard,
     });
@@ -164,7 +164,7 @@ exports.updateScript = async (req, res) => {
     res.json({
       success: true,
       message: 'Script updated successfully',
-      video,
+      video: updatedVideo,
     });
   } catch (error) {
     res.status(500).json({
@@ -183,7 +183,7 @@ exports.generateVideo = async (req, res) => {
     const { id } = req.params;
     const { resolution, format } = req.body;
 
-    const video = await Video.findByPk(id);
+    const video = await Video.findById(id);
 
     if (!video) {
       return res.status(404).json({
@@ -217,7 +217,7 @@ exports.generateVideo = async (req, res) => {
     }
 
     // Update video status and settings
-    await video.update({
+    await Video.update(video.id, {
       status: 'queued',
       resolution: resolution || '1080p',
       format: format || 'mp4',
@@ -228,18 +228,20 @@ exports.generateVideo = async (req, res) => {
     await queueVideoGeneration(video.id);
 
     // Reserve credits
-    await req.subscription.update({
+    await Subscription.update(req.subscription.id, {
       creditsUsed: req.subscription.creditsUsed + creditsNeeded,
     });
 
-    await video.update({
+    await Video.update(video.id, {
       creditsUsed: creditsNeeded,
     });
+
+    const updatedVideo = await Video.findById(video.id);
 
     res.json({
       success: true,
       message: 'Video generation started. You will be notified when it\'s ready.',
-      video,
+      video: updatedVideo,
       creditsUsed: creditsNeeded,
     });
   } catch (error) {
@@ -257,22 +259,19 @@ exports.generateVideo = async (req, res) => {
 // @access  Private
 exports.getVideos = async (req, res) => {
   try {
-    const { status, limit = 20, offset = 0 } = req.query;
+    const { status, limit = 20 } = req.query;
 
-    const where = { userId: req.user.id };
-    if (status) where.status = status;
+    let videos = await Video.findByUserId(req.user.id, parseInt(limit));
 
-    const videos = await Video.findAndCountAll({
-      where,
-      limit: parseInt(limit),
-      offset: parseInt(offset),
-      order: [['createdAt', 'DESC']],
-    });
+    // Filter by status if provided
+    if (status) {
+      videos = videos.filter(v => v.status === status);
+    }
 
     res.json({
       success: true,
-      count: videos.count,
-      videos: videos.rows,
+      count: videos.length,
+      videos,
     });
   } catch (error) {
     res.status(500).json({
@@ -290,7 +289,7 @@ exports.getVideo = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const video = await Video.findByPk(id);
+    const video = await Video.findById(id);
 
     if (!video) {
       return res.status(404).json({
@@ -326,7 +325,7 @@ exports.deleteVideo = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const video = await Video.findByPk(id);
+    const video = await Video.findById(id);
 
     if (!video) {
       return res.status(404).json({
@@ -347,7 +346,7 @@ exports.deleteVideo = async (req, res) => {
     if (video.sourceFileUrl) await deleteFile(video.sourceFileUrl);
     if (video.thumbnailUrl) await deleteFile(video.thumbnailUrl);
 
-    await video.destroy();
+    await Video.delete(video.id);
 
     res.json({
       success: true,
@@ -369,9 +368,7 @@ exports.getVideoStatus = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const video = await Video.findByPk(id, {
-      attributes: ['id', 'status', 'processingProgress', 'errorMessage', 'videoUrl'],
-    });
+    const video = await Video.findById(id);
 
     if (!video) {
       return res.status(404).json({
