@@ -1,7 +1,13 @@
 const Anthropic = require('@anthropic-ai/sdk');
 
+// Check if API key is configured
+const apiKey = process.env.ANTHROPIC_API_KEY;
+if (!apiKey) {
+  console.warn('WARNING: ANTHROPIC_API_KEY environment variable is not set. Script generation will fail.');
+}
+
 const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+  apiKey: apiKey || 'dummy-key', // Use dummy key to prevent initialization errors
 });
 
 /**
@@ -11,6 +17,11 @@ const anthropic = new Anthropic({
  * @returns {object} - Generated script with scenes
  */
 exports.generateScript = async (sourceText, language = 'en') => {
+  // Check API key availability
+  if (!apiKey) {
+    throw new Error('ANTHROPIC_API_KEY environment variable is not configured. Please configure it in Firebase Functions to enable script generation.');
+  }
+
   try {
     const prompt = `You are an expert whiteboard explainer video scriptwriter. Convert the following text into an engaging whiteboard animation script.
 

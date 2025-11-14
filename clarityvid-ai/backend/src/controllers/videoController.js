@@ -124,9 +124,19 @@ exports.generateVideoScript = async (req, res) => {
     });
   } catch (error) {
     console.error('Generate script error:', error);
-    res.status(500).json({
+
+    // Provide more helpful error messages
+    let statusCode = 500;
+    let message = 'Error generating script';
+
+    if (error.message && error.message.includes('ANTHROPIC_API_KEY')) {
+      statusCode = 503;
+      message = 'Script generation service is not configured. Please contact support.';
+    }
+
+    res.status(statusCode).json({
       success: false,
-      message: 'Error generating script',
+      message,
       error: error.message,
     });
   }
