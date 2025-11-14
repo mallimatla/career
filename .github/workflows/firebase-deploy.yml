@@ -28,14 +28,6 @@ jobs:
             clarityvid-ai/backend/package-lock.json
             clarityvid-ai/frontend/package-lock.json
 
-      - name: 📦 Cache Backend Dependencies
-        uses: actions/cache@v3
-        with:
-          path: clarityvid-ai/backend/node_modules
-          key: backend-deps-${{ hashFiles('clarityvid-ai/backend/package.json') }}
-          restore-keys: |
-            backend-deps-
-
       - name: 📦 Cache Frontend Dependencies
         uses: actions/cache@v3
         with:
@@ -44,18 +36,9 @@ jobs:
           restore-keys: |
             frontend-deps-
 
-      - name: 📦 Install System Dependencies for Canvas
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
-
-      - name: 📦 Install Backend Dependencies
-        working-directory: clarityvid-ai/backend
-        run: npm install
-
       - name: 📦 Install Frontend Dependencies
         working-directory: clarityvid-ai/frontend
-        run: npm ci
+        run: npm ci --prefer-offline
 
       - name: 🏗️ Build Frontend for Production
         working-directory: clarityvid-ai/frontend
