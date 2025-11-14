@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - claude/golpoai-website-clone-011CV59ETNzdTYb4hUnvgMMD
-  workflow_dispatch:  # Allows manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -23,6 +23,26 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            clarityvid-ai/backend/package-lock.json
+            clarityvid-ai/frontend/package-lock.json
+
+      - name: 📦 Cache Backend Dependencies
+        uses: actions/cache@v3
+        with:
+          path: clarityvid-ai/backend/node_modules
+          key: backend-deps-${{ hashFiles('clarityvid-ai/backend/package.json') }}
+          restore-keys: |
+            backend-deps-
+
+      - name: 📦 Cache Frontend Dependencies
+        uses: actions/cache@v3
+        with:
+          path: clarityvid-ai/frontend/node_modules
+          key: frontend-deps-${{ hashFiles('clarityvid-ai/frontend/package-lock.json') }}
+          restore-keys: |
+            frontend-deps-
 
       - name: 📦 Install System Dependencies for Canvas
         run: |
@@ -43,22 +63,9 @@ jobs:
         env:
           CI: false
 
-      - name: 🔍 Verify Build Output
-        working-directory: clarityvid-ai
-        run: |
-          echo "=== Checking build directory ==="
-          ls -la frontend/build/ || echo "Build directory not found!"
-          echo "=== Checking if index.html exists ==="
-          ls -la frontend/build/index.html || echo "index.html not found!"
-          echo "=== Current directory ==="
-          pwd
-          echo "=== Directory structure ==="
-          ls -la
-
       - name: 🔑 Setup Firebase Service Account
         run: |
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > firebase-adminsdk.json
-          export GOOGLE_APPLICATION_CREDENTIALS="firebase-adminsdk.json"
 
       - name: 🔥 Install Firebase Tools
         run: npm install -g firebase-tools
@@ -88,13 +95,7 @@ jobs:
           LOG_LEVEL=info
           EOF
 
-      - name: 🚀 Deploy Hosting First
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: firebase-adminsdk.json
-        run: |
-          firebase deploy --only hosting --project exodus-48741 --non-interactive
-
-      - name: 🚀 Deploy Everything
+      - name: 🚀 Deploy to Firebase
         env:
           GOOGLE_APPLICATION_CREDENTIALS: firebase-adminsdk.json
         run: |
@@ -109,4 +110,3 @@ jobs:
           echo "🎉 Deployment Complete!"
           echo "📱 Frontend: https://exodus-48741.web.app"
           echo "⚡ Backend: https://exodus-48741.web.app/api"
-          echo "🔐 Admin: https://exodus-48741.web.app/admin/login"
