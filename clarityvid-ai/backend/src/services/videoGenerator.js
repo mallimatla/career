@@ -1,13 +1,26 @@
-const { createCanvas } = require('canvas');
-const ffmpeg = require('fluent-ffmpeg');
-const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+// Lazy-load optional dependencies to avoid breaking Firebase Functions
+// These are only needed when actually generating videos
+let createCanvas, ffmpeg, ffmpegPath;
+
+const loadDependencies = () => {
+  if (!createCanvas) {
+    try {
+      createCanvas = require('canvas').createCanvas;
+      ffmpeg = require('fluent-ffmpeg');
+      ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+      ffmpeg.setFfmpegPath(ffmpegPath);
+    } catch (error) {
+      console.error('Failed to load video generation dependencies:', error.message);
+      throw new Error('Video generation dependencies not available. This feature requires canvas and ffmpeg to be installed.');
+    }
+  }
+};
+
 const path = require('path');
 const fs = require('fs').promises;
 const { v4: uuidv4 } = require('uuid');
 const { generateSceneAudio, estimateAudioDuration } = require('./ttsService');
 const { uploadFile } = require('./firebaseStorage');
-
-ffmpeg.setFfmpegPath(ffmpegPath);
 
 /**
  * Generate complete whiteboard animation video
@@ -15,6 +28,9 @@ ffmpeg.setFfmpegPath(ffmpegPath);
  * @returns {string} - Generated video URL
  */
 exports.generateWhiteboardVideo = async (videoData) => {
+  // Load dependencies only when actually generating a video
+  loadDependencies();
+
   const {
     id,
     script,
