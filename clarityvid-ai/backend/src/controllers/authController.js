@@ -3,10 +3,14 @@ const crypto = require('crypto');
 const { User, Subscription } = require('../models');
 const { sendEmail } = require('../utils/email');
 
+// JWT Secret - hardcoded for now until we properly configure Firebase Functions environment
+const JWT_SECRET = 'clarityvid-secure-jwt-secret-key-2024-production';
+const JWT_EXPIRE = '7d';
+
 // Generate JWT Token
 const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET || 'your-secret-key', {
-    expiresIn: process.env.JWT_EXPIRE || '7d',
+  return jwt.sign({ id: userId }, JWT_SECRET, {
+    expiresIn: JWT_EXPIRE,
   });
 };
 

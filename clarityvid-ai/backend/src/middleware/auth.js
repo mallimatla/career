@@ -1,6 +1,9 @@
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 
+// JWT Secret - hardcoded for now until we properly configure Firebase Functions environment
+const JWT_SECRET = 'clarityvid-secure-jwt-secret-key-2024-production';
+
 const protect = async (req, res, next) => {
   let token;
 
@@ -9,6 +12,7 @@ const protect = async (req, res, next) => {
   }
 
   if (!token) {
+    console.log('Auth middleware: No token provided');
     return res.status(401).json({
       success: false,
       message: 'Not authorized to access this route',
@@ -16,17 +20,21 @@ const protect = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log('Auth middleware: Verifying token...');
+    const decoded = jwt.verify(token, JWT_SECRET);
+    console.log('Auth middleware: Token verified, user ID:', decoded.id);
 
     const user = await User.findById(decoded.id);
 
     if (!user) {
+      console.log('Auth middleware: User not found for ID:', decoded.id);
       return res.status(401).json({
         success: false,
         message: 'User no longer exists',
       });
     }
 
+    console.log('Auth middleware: User found:', user.email);
     req.user = user;
     next();
   } catch (error) {
