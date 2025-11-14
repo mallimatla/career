@@ -48,13 +48,20 @@ export const authAPI = {
 // Video APIs
 export const videoAPI = {
   create: (data) => {
-    const formData = new FormData();
-    Object.keys(data).forEach(key => {
-      if (data[key]) formData.append(key, data[key]);
-    });
-    return api.post('/videos', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    // Only use FormData if there's a file to upload
+    if (data.file) {
+      const formData = new FormData();
+      Object.keys(data).forEach(key => {
+        if (data[key]) formData.append(key, data[key]);
+      });
+      return api.post('/videos', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+    } else {
+      // Send as JSON if no file
+      const { file, ...jsonData } = data;
+      return api.post('/videos', jsonData);
+    }
   },
   getAll: (params) => api.get('/videos', { params }),
   getOne: (id) => api.get(`/videos/${id}`),

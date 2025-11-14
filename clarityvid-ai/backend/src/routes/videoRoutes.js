@@ -26,12 +26,15 @@ const optionalFileUpload = (req, res, next) => {
   const uploadMiddleware = upload.single('file');
   uploadMiddleware(req, res, (err) => {
     if (err) {
+      console.log('Multer/Busboy error:', err.message);
       // If it's a busboy/multer parsing error and no file was intended, ignore it
-      if (err.message && err.message.includes('Unexpected end of form')) {
-        console.log('Multipart parsing issue, treating as no file upload');
+      const errorString = String(err.message || err);
+      if (errorString.includes('Unexpected end of form') || errorString.includes('Unexpected end')) {
+        console.log('Multipart parsing issue detected, treating as no file upload');
         return next();
       }
       // For other errors, pass them along
+      console.error('File upload error:', err);
       return next(err);
     }
     next();

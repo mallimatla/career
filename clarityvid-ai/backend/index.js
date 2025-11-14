@@ -72,6 +72,16 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error('Error:', err);
 
+  // Handle multer/busboy errors gracefully
+  const errorString = String(err.message || err);
+  if (errorString.includes('Unexpected end of form') || errorString.includes('Multipart')) {
+    console.log('Handling multipart form parsing error gracefully');
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid form data. Please ensure all fields are filled correctly.',
+    });
+  }
+
   res.status(err.status || 500).json({
     success: false,
     message: err.message || 'Internal server error',
