@@ -114,9 +114,7 @@ exports.getPlans = (req, res) => {
 // @access  Private
 exports.getCurrentSubscription = async (req, res) => {
   try {
-    const subscription = await Subscription.findOne({
-      where: { userId: req.user.id },
-    });
+    const subscription = await Subscription.findByUserId(req.user.id);
 
     if (!subscription) {
       return res.status(404).json({
@@ -130,12 +128,13 @@ exports.getCurrentSubscription = async (req, res) => {
     res.json({
       success: true,
       subscription: {
-        ...subscription.toJSON(),
+        ...subscription,
         availableCredits,
         planDetails: PLANS[subscription.plan],
       },
     });
   } catch (error) {
+    console.error('Get subscription error:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching subscription',

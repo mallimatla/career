@@ -48,7 +48,7 @@ exports.login = async (req, res) => {
       message: 'Login successful.',
       data: {
         token,
-        admin: admin.toJSON(),
+        admin,
       },
     });
   } catch (error) {
@@ -68,7 +68,7 @@ exports.getProfile = async (req, res) => {
   try {
     res.json({
       success: true,
-      data: req.admin.toJSON(),
+      data: req.admin,
     });
   } catch (error) {
     res.status(500).json({
