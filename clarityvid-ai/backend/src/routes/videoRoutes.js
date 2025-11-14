@@ -21,8 +21,25 @@ const upload = multer({
   },
 });
 
+// Wrapper to handle optional file upload errors gracefully
+const optionalFileUpload = (req, res, next) => {
+  const uploadMiddleware = upload.single('file');
+  uploadMiddleware(req, res, (err) => {
+    if (err) {
+      // If it's a busboy/multer parsing error and no file was intended, ignore it
+      if (err.message && err.message.includes('Unexpected end of form')) {
+        console.log('Multipart parsing issue, treating as no file upload');
+        return next();
+      }
+      // For other errors, pass them along
+      return next(err);
+    }
+    next();
+  });
+};
+
 // Routes
-router.post('/', protect, checkCredits, upload.single('file'), videoController.createVideo);
+router.post('/', protect, checkCredits, optionalFileUpload, videoController.createVideo);
 router.get('/', protect, videoController.getVideos);
 router.get('/:id', protect, videoController.getVideo);
 router.delete('/:id', protect, videoController.deleteVideo);
