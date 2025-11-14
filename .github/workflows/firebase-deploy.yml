@@ -63,6 +63,31 @@ jobs:
       - name: 🔥 Install Firebase Tools
         run: npm install -g firebase-tools
 
+      - name: ⚙️ Create Backend Environment File
+        working-directory: clarityvid-ai/backend
+        run: |
+          cat > .env << 'EOF'
+          # Server Configuration
+          NODE_ENV=production
+          API_URL=https://exodus-48741.web.app/api
+          FRONTEND_URL=https://exodus-48741.web.app
+
+          # JWT Configuration
+          JWT_SECRET=clarityvid-secure-jwt-secret-key-2024-production
+          JWT_EXPIRE=7d
+
+          # Rate Limiting
+          RATE_LIMIT_WINDOW=15
+          RATE_LIMIT_MAX_REQUESTS=100
+
+          # Video Processing
+          MAX_VIDEO_DURATION=60
+          VIDEO_PROCESSING_TIMEOUT=900000
+
+          # Logging
+          LOG_LEVEL=info
+          EOF
+
       - name: 🚀 Deploy Hosting First
         env:
           GOOGLE_APPLICATION_CREDENTIALS: firebase-adminsdk.json
