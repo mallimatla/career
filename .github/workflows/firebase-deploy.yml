@@ -105,8 +105,31 @@ jobs:
         if: always()
         run: rm -f firebase-adminsdk.json
 
+      - name: 🧪 Install E2E Test Dependencies
+        working-directory: clarityvid-ai/e2e
+        run: npm install
+
+      - name: 🎭 Install Playwright Browsers
+        working-directory: clarityvid-ai/e2e
+        run: npx playwright install chromium --with-deps
+
+      - name: 🧪 Run E2E Tests
+        working-directory: clarityvid-ai/e2e
+        run: npm test
+        env:
+          BASE_URL: https://exodus-48741.web.app
+
+      - name: 📊 Upload Test Report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-report
+          path: clarityvid-ai/e2e/playwright-report/
+          retention-days: 30
+
       - name: ✅ Deployment Summary
         run: |
           echo "🎉 Deployment Complete!"
           echo "📱 Frontend: https://exodus-48741.web.app"
           echo "⚡ Backend: https://exodus-48741.web.app/api"
+          echo "✅ E2E Tests: Passed"
