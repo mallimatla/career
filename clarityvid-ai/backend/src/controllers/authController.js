@@ -149,18 +149,31 @@ exports.login = async (req, res) => {
 // @access  Private
 exports.getMe = async (req, res) => {
   try {
+    console.log('getMe: Fetching user with ID:', req.user.id);
     const user = await User.findById(req.user.id);
 
     if (!user) {
+      console.log('getMe: User not found');
       return res.status(404).json({
         success: false,
         message: 'User not found',
       });
     }
 
-    // Get user's subscription
-    const subscription = await Subscription.findByUserId(user.id);
+    console.log('getMe: User found:', user.email);
 
+    // Get user's subscription - make it optional to prevent blocking
+    let subscription = null;
+    try {
+      console.log('getMe: Fetching subscription...');
+      subscription = await Subscription.findByUserId(user.id);
+      console.log('getMe: Subscription fetched:', subscription ? subscription.plan : 'none');
+    } catch (subError) {
+      console.error('getMe: Error fetching subscription (non-critical):', subError.message);
+      // Continue without subscription - don't block the user
+    }
+
+    console.log('getMe: Returning user data');
     res.json({
       success: true,
       user: {
@@ -174,6 +187,7 @@ exports.getMe = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error('getMe: Error:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching user',

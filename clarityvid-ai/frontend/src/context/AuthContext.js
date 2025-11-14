@@ -7,13 +7,16 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('token'));
+  const [skipFetch, setSkipFetch] = useState(false);
 
   useEffect(() => {
-    if (token) {
+    // Only fetch user on initial load, not after login/register
+    if (token && !skipFetch && !user) {
       fetchUser();
     } else {
       setLoading(false);
     }
+    setSkipFetch(false); // Reset for next time
   }, [token]);
 
   const fetchUser = async () => {
@@ -33,8 +36,10 @@ export const AuthProvider = ({ children }) => {
       const response = await authAPI.login({ email, password });
       const { token, user } = response.data;
       localStorage.setItem('token', token);
-      setToken(token);
+      setSkipFetch(true); // Don't fetch user again, we already have it
       setUser(user);
+      setToken(token);
+      setLoading(false);
       return { success: true };
     } catch (error) {
       return {
@@ -49,8 +54,10 @@ export const AuthProvider = ({ children }) => {
       const response = await authAPI.register(data);
       const { token, user } = response.data;
       localStorage.setItem('token', token);
-      setToken(token);
+      setSkipFetch(true); // Don't fetch user again, we already have it
       setUser(user);
+      setToken(token);
+      setLoading(false);
       return { success: true };
     } catch (error) {
       return {
